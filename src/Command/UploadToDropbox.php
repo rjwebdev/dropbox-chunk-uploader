@@ -16,11 +16,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class UploadToDropbox extends Command
 {
     private HttpClientInterface $client;
+    private string $dropboxBasePath;
     private LoggerInterface $logger;
 
-    public function __construct(string $accessToken, LoggerInterface $logger)
+    public function __construct(string $accessToken, string $dropboxBasePath, LoggerInterface $logger)
     {
         $this->client = HttpClient::createForBaseUri('https://content.dropboxapi.com/2/', ['auth_bearer' => $accessToken]);
+        $this->dropboxBasePath = $dropboxBasePath;
         $this->logger = $logger;
 
         parent::__construct();
@@ -90,7 +92,7 @@ final class UploadToDropbox extends Command
                         'offset' => $offset,
                     ],
                     'commit' => [
-                        'path' => sprintf('/HelloFirstFolder%s', basename($filePath)),
+                        'path' => $this->dropboxBasePath.basename($filePath),
                         'mode' => 'add',
                         'autorename' => true,
                     ]
